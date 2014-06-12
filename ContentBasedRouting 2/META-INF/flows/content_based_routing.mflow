@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="content_based_routing">
+    <flow SubFlow="false" name="content_based_routingFlow1" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="f90e0318-e22c-4d50-afa0-10bae18c3fce">
+        <properties>
+            <property name="initialState"/>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="1"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
+            <endpoint direction="Inbound" name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#1">
+                <properties>
+                    <property name="exchange-pattern" value="request-response"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+                    <property name="httpLabel"/>
+                    <property name="host" value="localhost"/>
+                    <property name="port" value="8081"/>
+                    <property name="path"/>
+                    <property name="connector-ref"/>
+                    <property name="method"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="address"/>
+                    <property name="encoding"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="mimeType"/>
+                    <property name="responseTimeout"/>
+                    <property name="followRedirects"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="user"/>
+                    <property name="password"/>
+                    <property name="contentType"/>
+                    <property name="keepAlive"/>
+                    <property name="auxiliary;index" value="2"/>
+                </properties>
+            </endpoint>
+            <pattern name="Expression" type="org.mule.tooling.ui.modules.core.filter.Expression" entity-id="Expression#1">
+                <properties>
+                    <property name="evaluator"/>
+                    <property name="expression" value="#[payload != '/favicon.ico']"/>
+                    <property name="customEvaluator"/>
+                    <property name="nullReturnsTrue"/>
+                    <property name="auxiliary;index" value="3"/>
+                </properties>
+            </pattern>
+            <pattern name="Set language variable" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#1">
+                <properties>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
+                    <property name="variableName" value="language"/>
+                    <property name="value" value="#[message.inboundProperties.language]"/>
+                    <property name="auxiliary;index" value="4"/>
+                </properties>
+            </pattern>
+            <splitter index="5" name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#1">
+                <properties>
+                    <property-collection name="5bab0c7f-d7f4-463f-9af3-625180220858">
+                        <property name="choice.expression" value="#[flowVars.language == 'Spanish']"/>
+                        <property-collection name="choice.attributes">
+                            <property name="expression" value="#[flowVars.language == 'Spanish']"/>
+                        </property-collection>
+                    </property-collection>
+                    <property-collection name="7df33ca5-8901-43a3-a3e5-06a2c385d603">
+                        <property name="choice.expression" value="#[flowVars.language == 'French']"/>
+                        <property-collection name="choice.attributes">
+                            <property name="expression" value="#[flowVars.language == 'French']"/>
+                        </property-collection>
+                    </property-collection>
+                    <property-collection name="24fa7637-0223-42a3-9326-ee793ba1dc0d">
+                        <property name="choice.otherwise" value="true"/>
+                        <property-collection name="choice.attributes"/>
+                    </property-collection>
+                </properties>
+                <pattern name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#2"/>
+                <compartment entity-id="compartment#1">
+                    <lane hadOnlyOneElement="false" index="7" isChoiceOtherwiseLane="false" entity-id="5bab0c7f-d7f4-463f-9af3-625180220858">
+                        <pattern name="Reply in Spanish" type="http://www.mulesoft.org/schema/mule/core/set-payload" entity-id="Set Payload#1">
+                            <properties>
+<property name="value" value="Hola!"/>
+<property name="auxiliary;index" value="7"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                    <lane hadOnlyOneElement="false" index="9" isChoiceOtherwiseLane="false" entity-id="7df33ca5-8901-43a3-a3e5-06a2c385d603">
+                        <pattern name="Reply in French" type="http://www.mulesoft.org/schema/mule/core/set-payload" entity-id="Set Payload#2">
+                            <properties>
+<property name="value" value="Bonjour!"/>
+<property name="auxiliary;index" value="9"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                    <lane hadOnlyOneElement="false" index="11" isChoiceOtherwiseLane="true" entity-id="24fa7637-0223-42a3-9326-ee793ba1dc0d">
+                        <pattern name="Set language to English" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#2">
+                            <properties>
+<property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
+<property name="variableName" value="language"/>
+<property name="value" value="English"/>
+<property name="auxiliary;index" value="11"/>
+                            </properties>
+                        </pattern>
+                        <pattern name="Reply in English" type="http://www.mulesoft.org/schema/mule/core/set-payload" entity-id="Set Payload#3">
+                            <properties>
+<property name="value" value="Hello!"/>
+<property name="auxiliary;index" value="12"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </splitter>
+            <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
+                <properties>
+                    <property name="message" value="The reply &quot;#[payload]&quot; means &quot;hello&quot; in #[flowVars.language]."/>
+                    <property name="level" value="INFO"/>
+                    <property name="category"/>
+                    <property name="auxiliary;index" value="13"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+</mule-configuration>
